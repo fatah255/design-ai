@@ -1,10 +1,6 @@
 import EditorClient from "@/features/editor/components/editorClient";
 const EditorProjectIdPage = () => {
-  return (
-    <div>
-      <EditorClient />
-    </div>
-  );
+  return <EditorClient />;
 };
 
 export default EditorProjectIdPage;
