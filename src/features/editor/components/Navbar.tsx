@@ -18,8 +18,15 @@ import { CiFileOn } from "react-icons/ci";
 import { Separator } from "@/components/ui/separator";
 import { Hint } from "@/components/Hint";
 import { BsCloudCheck } from "react-icons/bs";
+import { ActiveTool } from "../types";
+import { cn } from "@/lib/utils";
 
-const Navbar = () => {
+interface NavbarProps {
+  activeTool: ActiveTool;
+  onChangeActiveTool: (tool: ActiveTool) => void;
+}
+
+const Navbar = ({ activeTool, onChangeActiveTool }: NavbarProps) => {
   return (
     <nav className="w-full flex items-center p-4 h-[68px] gap-x-8 border-b lg:p-[34px]">
       <Logo />
@@ -45,7 +52,14 @@ const Navbar = () => {
         </DropdownMenu>
         <Separator orientation="vertical" className="mx-2" />
         <Hint label="Select" side="bottom" sideOffset={10}>
-          <Button variant="ghost" size="icon">
+          <Button
+            onClick={() => {
+              onChangeActiveTool("select");
+            }}
+            variant="ghost"
+            size="icon"
+            className={cn(activeTool === "select" && "bg-gray-100")}
+          >
             <MousePointerClick className="size-4" />
           </Button>
         </Hint>
