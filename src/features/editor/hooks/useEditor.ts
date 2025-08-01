@@ -19,7 +19,7 @@ import {
   TRIANGLE_OPTIONS,
 } from "../types";
 import useCanvasEvents from "./useCanvasEvents";
-import { isTextType } from "../utils";
+import { isTextType, createFilter } from "../utils";
 
 const buildEditor = ({
   setFontFamily,
@@ -159,6 +159,11 @@ const buildEditor = ({
       const value = selectedObject.get("underline") || false;
 
       return value;
+    },
+    delete: () => {
+      canvas.getActiveObjects().forEach((object) => canvas.remove(object));
+      canvas.discardActiveObject();
+      canvas.renderAll();
     },
     changeFontLinethrough: (value: boolean) => {
       canvas.getActiveObjects().forEach((object) => {
@@ -347,6 +352,37 @@ const buildEditor = ({
       );
       addToCanvas(object);
     },
+    changeImageFilter: (value: string) => {
+      const objects = canvas.getActiveObjects();
+      objects.forEach((object) => {
+        if (object.type === "image") {
+          const imageObject = object as fabric.Image;
+
+          const effect = createFilter(value);
+
+          imageObject.filters = effect ? [effect] : [];
+          imageObject.applyFilters();
+          canvas.renderAll();
+        }
+      });
+    },
+    addImage: (value: string) => {
+      fabric.Image.fromURL(
+        value,
+        (image) => {
+          const workspace = getWorkspace();
+
+          image.scaleToWidth(workspace?.width || 0);
+          image.scaleToHeight(workspace?.height || 0);
+
+          addToCanvas(image);
+        },
+        {
+          crossOrigin: "anonymous",
+        }
+      );
+    },
+
     addDiamond: () => {
       const WIDTH = 400;
       const HEIGHT = 400;
@@ -502,15 +538,6 @@ const useEditor = ({ clearSelectionCallback }: EditorHookProps) => {
       initialCanvas.centerObject(initialWorkspace);
 
       initialCanvas.clipPath = initialWorkspace;
-
-      const test = new fabric.Rect({
-        width: 100,
-        height: 100,
-        fill: "black",
-      });
-
-      initialCanvas.add(test);
-      initialCanvas.centerObject(test);
 
       setCanvas(initialCanvas);
       setContainer(initialContainer);
